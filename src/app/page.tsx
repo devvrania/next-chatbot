@@ -1,16 +1,79 @@
-export default function Home() {
+'use client';
+
+import { useEffect, useState } from 'react';
+import { ChatMessage } from '@/lib/db/chat/types';
+import ChatWindow from '@/components/ChatWindow';
+import ChatInput from '@/components/ChatInput';
+import { loadConversation, sendChatRequest } from '@/lib/db/chat/client';
+
+const STORAGE_KEY = 'chatbot_conversation_id';
+
+export default function HomePage() {
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const storedId =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem(STORAGE_KEY)
+        : null;
+
+    if (!storedId) return;
+
+    (async () => {
+      try {
+        const res = await loadConversation(storedId);
+        setConversationId(res.conversationId);
+        setMessages(res.messages);
+      } catch (error) {
+        console.error(error);
+        window.localStorage.removeItem(STORAGE_KEY);
+      }
+    })();
+  }, []);
+
+  const handleSend = async (text: string) => {
+    if (!text.trim() || isLoading) return;
+
+    try {
+      setIsLoading(true);
+
+      const res = await sendChatRequest({
+        conversationId: conversationId ?? undefined,
+        content: text,
+      });
+
+      setConversationId(res.conversationId);
+      setMessages(res.messages);
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(STORAGE_KEY, res.conversationId);
+      }
+    } catch (error) {
+      console.error(error);
+      // Optional: show UI error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            This is chatbot application
+    <main className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl flex flex-col h-[80vh]">
+        <header className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+          <h1 className="text-lg font-semibold text-slate-800">
+            LLM Chatbot 🤖
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Built with Next.js, TypeScript, Tailwind CSS, and OpenAI API.
-          </p>
-        </div>
-      </main>
-    </div>
+          {isLoading && (
+            <span className="text-xs text-slate-500">Thinking...</span>
+          )}
+        </header>
+
+        <ChatWindow messages={messages} />
+
+        <ChatInput onSend={handleSend} disabled={isLoading} />
+      </div>
+    </main>
   );
 }
