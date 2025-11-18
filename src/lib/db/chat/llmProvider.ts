@@ -21,7 +21,7 @@ function buildOpenAIMessages(history: ChatMessage[]) {
 export async function generateLLMReply(
   history: ChatMessage[]
 ): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.NEXT_CHATBOT_OPENAI_KEY;
   if (!apiKey) {
     console.error('Missing OPENAI_API_KEY');
     throw new Error('LLM not configured');

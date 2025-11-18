@@ -1,5 +1,5 @@
+import { AppDataSource } from '@/data-source';
 import { DataSource } from 'typeorm';
-import { AppDataSource } from '../data-source';
 
 let dataSource: DataSource | null = null;
 

@@ -1,8 +1,4 @@
-import {
-  ChatMessage,
-  ChatRequestBody,
-  ChatResponseBody,
-} from './types';
+import { ChatRequestBody, ChatResponseBody } from './types';
 
 export async function sendChatRequest(
   body: ChatRequestBody
@@ -24,8 +20,8 @@ export async function loadConversation(
   conversationId: string
 ): Promise<ChatResponseBody> {
   const res = await fetch(`/api/chat?conversationId=${conversationId}`);
-
   if (!res.ok) {
+    console.error('Failed to load conversation', await res.text());
     throw new Error(`Chat API error: ${res.status}`);
   }
 

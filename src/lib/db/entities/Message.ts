@@ -15,7 +15,11 @@ export class Message {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: ['user', 'assistant', 'system'],
+    default: 'user',
+  })
   @Index()
   role!: MessageRole;
 
@@ -25,7 +29,7 @@ export class Message {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ManyToOne(() => Conversation, conversation => conversation.messages, {
+  @ManyToOne(() => Conversation, {
     onDelete: 'CASCADE',
   })
   conversation!: Conversation;

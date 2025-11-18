@@ -1,13 +1,17 @@
-
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { Message } from './Message';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Conversation {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   title!: string | null;
 
   @CreateDateColumn()
@@ -15,7 +19,4 @@ export class Conversation {
 
   @UpdateDateColumn()
   updatedAt!: Date;
-
-  @OneToMany(() => Message, message => message.conversation)
-  messages!: Message[];
 }

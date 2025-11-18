@@ -39,6 +39,8 @@ export default function HomePage() {
     try {
       setIsLoading(true);
 
+      console.log('Sending message:', text);
+
       const res = await sendChatRequest({
         conversationId: conversationId ?? undefined,
         content: text,
@@ -46,6 +48,9 @@ export default function HomePage() {
 
       setConversationId(res.conversationId);
       setMessages(res.messages);
+
+      console.log('ConversationId is now:', res.conversationId);
+      console.log('Messages:', res.messages);
 
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(STORAGE_KEY, res.conversationId);

@@ -60,6 +60,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ChatRequestBody;
 
+    console.log('Received POST body:', body);
+
     if (!body.content || typeof body.content !== 'string') {
       return NextResponse.json(
         { error: 'content is required' },
